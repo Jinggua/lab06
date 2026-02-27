@@ -48,8 +48,17 @@ main(void) {
     }
 
     // ===================================================== //
-    // SET LED GPIO PINS FOR OUTPUT                          //
-    // ===================================================== //
+    // SET GPIO 2, 3, 4 FOR OUTPUT IN ONE GO                 //
+    // ALL THREE ARE IN GPFSEL0 (GPIO+0)                     //
+    // GPIO2 = bit6~8   GPIO3 = bit9~11   GPIO4 = bit12~14  //
+    // CLEAR bit6~14 FIRST                                   //
+    // 1111 1111 1111 1111 1000 0000 0011 1111               //
+    MASK = 0xFFFF803F;
+    *(GPIO + 0) = *(GPIO + 0) & MASK;
+    // SET bit6=1(GPIO2) bit9=1(GPIO3) bit12=1(GPIO4)        //
+    // 0000 0000 0000 0001 0010 0100 0100 0000               //
+    MASK = 0x00001240;
+    *(GPIO + 0) = *(GPIO + 0) | MASK;
 
     // SET GPIO 17 FOR OUTPUT //
     // GPFSEL1 (GPIO+1), GPIO17 occupies bit21~23 //
@@ -60,42 +69,15 @@ main(void) {
     MASK = 0x00200000;
     *(GPIO + 1) = *(GPIO + 1) | MASK;
 
-    // SET GPIO 4 FOR OUTPUT //
-    // GPFSEL0 (GPIO+0), GPIO4 occupies bit12~14 //
-    // 1111 1111 1111 1000 0111 1111 1111 1111    //
-    // 0000 0000 0000 0001 0000 0000 0000 0000    //
-    MASK = 0xFFFF87FF;
-    *(GPIO + 0) = *(GPIO + 0) & MASK;
-    MASK = 0x00001000;
-    *(GPIO + 0) = *(GPIO + 0) | MASK;
-
-    // SET GPIO 3 FOR OUTPUT //
-    // GPFSEL0 (GPIO+0), GPIO3 occupies bit9~11  //
-    // 1111 1111 1111 1111 1111 0011 1111 1111    //
-    // 0000 0000 0000 0000 0000 0010 0000 0000    //
-    MASK = 0xFFFFF3FF;
-    *(GPIO + 0) = *(GPIO + 0) & MASK;
-    MASK = 0x00000200;
-    *(GPIO + 0) = *(GPIO + 0) | MASK;
-
-    // SET GPIO 2 FOR OUTPUT //
-    // GPFSEL0 (GPIO+0), GPIO2 occupies bit6~8   //
-    // 1111 1111 1111 1111 1111 1111 0001 1111    //
-    // 0000 0000 0000 0000 0000 0000 0100 0000    //
-    MASK = 0xFFFFFF1F;
-    *(GPIO + 0) = *(GPIO + 0) & MASK;
-    MASK = 0x00000040;
-    *(GPIO + 0) = *(GPIO + 0) | MASK;
-
     // ===================================================== //
     // SET BUTTON GPIO PINS FOR INPUT                        //
     // ===================================================== //
 
-    // SET GPIO 27 FOR INPUT (B2 - EXIT) //
-    // GPFSEL2 (GPIO+2), GPIO27 occupies bit21~23 //
-    // 1111 1111 0001 1111 1111 1111 1111 1111     //
-    MASK = 0xFF1FFFFF;
-    *(GPIO + 2) = *(GPIO + 2) & MASK;
+    // SET GPIO 10 FOR INPUT (B1 - LEFT TO RIGHT) //
+    // GPFSEL1 (GPIO+1), GPIO10 occupies bit0~2   //
+    // 1111 1111 1111 1111 1111 1111 1111 1000     //
+    MASK = 0xFFFFFFF8;
+    *(GPIO + 1) = *(GPIO + 1) & MASK;
 
     // SET GPIO 22 FOR INPUT (B0 - RIGHT TO LEFT) //
     // GPFSEL2 (GPIO+2), GPIO22 occupies bit6~8   //
@@ -103,11 +85,11 @@ main(void) {
     MASK = 0xFFFFFF1F;
     *(GPIO + 2) = *(GPIO + 2) & MASK;
 
-    // SET GPIO 10 FOR INPUT (B1 - LEFT TO RIGHT) //
-    // GPFSEL1 (GPIO+1), GPIO10 occupies bit0~2   //
-    // 1111 1111 1111 1111 1111 1111 1111 1000     //
-    MASK = 0xFFFFFFF8;
-    *(GPIO + 1) = *(GPIO + 1) & MASK;
+    // SET GPIO 27 FOR INPUT (B2 - EXIT)          //
+    // GPFSEL2 (GPIO+2), GPIO27 occupies bit21~23 //
+    // 1111 1111 0001 1111 1111 1111 1111 1111     //
+    MASK = 0xFF1FFFFF;
+    *(GPIO + 2) = *(GPIO + 2) & MASK;
 
     // ===================================================== //
     // TURN ALL LEDs OFF INITIALLY                           //
