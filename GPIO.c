@@ -67,6 +67,25 @@ main(void) {
     *(GPIO + 10) = MASK;
 
     do {
+        // 读取按钮状态
+        unsigned int gpio_level = *(GPIO + 13);
+        
+        // 显示GPIO5和GPIO6的状态（调试用）
+        printf("GPIO5: %d, GPIO6: %d\n", 
+              (gpio_level & 0x00000020) ? 1 : 0,
+              (gpio_level & 0x00000040) ? 1 : 0);
+        
+        // 检测GPIO5低电平（开关拨向左）- 从右到左
+        if ((gpio_level & 0x00000020) == 0) {
+            dir = 2;  // 从右到左
+            printf("方向: 从右到左\n");
+        }
+        // 检测GPIO6低电平（开关拨向右）- 从左到右
+        else if ((gpio_level & 0x00000040) == 0) {
+            dir = 1;  // 从左到右
+            printf("方向: 从左到右\n");
+        }
+        
         // TURN ALL LEDs OFF
         MASK = 0x00400000 | 0x00800000 | 0x01000000 | 0x02000000;
         *(GPIO + 10) = MASK;
@@ -75,29 +94,31 @@ main(void) {
         
         // SET CURRENT LED HIGH
         if (pos == 0) {
-            MASK = 0x00400000;  // GPIO22
+            MASK = 0x00400000;  // GPIO22 (LED1)
             *(GPIO + 7) = MASK;
-            printf("LED1 (GPIO22) 亮\n");
-            usleep(500000);
+            usleep(200000);
         } else if (pos == 1) {
-            MASK = 0x00800000;  // GPIO23
+            MASK = 0x00800000;  // GPIO23 (LED2)
             *(GPIO + 7) = MASK;
-            printf("LED2 (GPIO23) 亮\n");
-            usleep(500000);
+            usleep(200000);
         } else if (pos == 2) {
-            MASK = 0x01000000;  // GPIO24
+            MASK = 0x01000000;  // GPIO24 (LED3)
             *(GPIO + 7) = MASK;
-            printf("LED3 (GPIO24) 亮\n");
-            usleep(500000);
+            usleep(200000);
         } else if (pos == 3) {
-            MASK = 0x02000000;  // GPIO25
+            MASK = 0x02000000;  // GPIO25 (LED4)
             *(GPIO + 7) = MASK;
-            printf("LED4 (GPIO25) 亮\n");
-            usleep(500000);
+            usleep(200000);
         }
         
-        // 移动到下一个LED (0->1->2->3->0)
-        pos = (pos + 1) % 4;
+        // 根据方向移动位置
+        if (dir == 1) {  // 从左到右
+            pos = (pos + 1) % 4;  // 0->1->2->3->0
+            printf("位置移动到: %d\n", pos);
+        } else if (dir == 2) {  // 从右到左
+            pos = (pos - 1 + 4) % 4;  // 3->2->1->0->3
+            printf("位置移动到: %d\n", pos);
+        }
         
         // 检查退出按钮
         MASK = 0x08000000;
