@@ -22,7 +22,7 @@ main(void) {
     int MEM, MASK;
     int BUTTON = 0;
     int pos = 0;   // CURRENT LED POSITION 0~3 //
-    int dir = 0;   // DIRECTION: 0=STOP 1=RIGHT TO LEFT 2=LEFT TO RIGHT //
+    int dir = 0;   // 0=STOP 1=RIGHT TO LEFT 2=LEFT TO RIGHT //
 
     // TEST FOR ROOT ACCESS //
     if (getuid() != 0) {
@@ -47,39 +47,29 @@ main(void) {
         return 3;
     }
 
-    // ===================================================== //
-    // SET GPIO 22, 23, 24, 25 FOR OUTPUT IN ONE GO          //
-    // ALL FOUR ARE IN GPFSEL2 (GPIO+2)                      //
-    // GPIO22 = bit6~8   GPIO23 = bit9~11                    //
-    // GPIO24 = bit12~14  GPIO25 = bit15~17                  //
-    // CLEAR bit6~17 FIRST                                   //
-    // 1111 1111 1111 1100 0000 0000 0011 1111               //
+    // SET GPIO 22, 23, 24, 25 FOR OUTPUT //
+    // GPFSEL2 (GPIO+2), CLEAR bit6~17    //
+    // 1111 1111 1111 1100 0000 0000 0011 1111 //
     MASK = 0xFFFC003F;
     *(GPIO + 2) = *(GPIO + 2) & MASK;
-    // SET bit6=1(GPIO22) bit9=1(GPIO23)                     //
-    //     bit12=1(GPIO24) bit15=1(GPIO25)                   //
-    // 0000 0000 0000 1001 0010 0100 0100 0000               //
+    // SET 001 FOR EACH GPIO               //
+    // 0000 0000 0000 1001 0010 0100 0100 0000 //
     MASK = 0x00009240;
     *(GPIO + 2) = *(GPIO + 2) | MASK;
 
-    // ===================================================== //
-    // SET BUTTON GPIO PINS FOR INPUT                        //
-    // B0=GPIO5, B1=GPIO6 IN GPFSEL0 (GPIO+0)               //
-    // GPIO5 = bit15~17   GPIO6 = bit18~20                  //
-    // CLEAR bit15~20 (000=INPUT, no need to OR)             //
-    // 1111 1111 1000 0000 0111 1111 1111 1111               //
-    MASK = 0xFF807FFF;
-    *(GPIO + 0) = *(GPIO + 0) & MASK;
-
-    // B2=GPIO27 IN GPFSEL2 (GPIO+2), bit21~23              //
-    // 1111 1111 0001 1111 1111 1111 1111 1111               //
+    // SET GPIO 27 FOR INPUT (B2 EXIT)     //
+    // GPFSEL2 (GPIO+2), bit21~23          //
+    // 1111 1111 0001 1111 1111 1111 1111 1111 //
     MASK = 0xFF1FFFFF;
     *(GPIO + 2) = *(GPIO + 2) & MASK;
 
-    // ===================================================== //
-    // TURN ALL LEDs OFF INITIALLY                           //
-    // ===================================================== //
+    // SET GPIO 5, 6 FOR INPUT (B0, B1)    //
+    // GPFSEL0 (GPIO+0), bit15~20          //
+    // 1111 1111 1000 0000 0111 1111 1111 1111 //
+    MASK = 0xFF807FFF;
+    *(GPIO + 0) = *(GPIO + 0) & MASK;
 
+    // TURN ALL LEDs OFF INITIALLY //
     // SET GPIO 22 LOW //
     // 0000 0000 0100 0000 0000 0000 0000 0000 //
     MASK = 0x00400000;
@@ -113,9 +103,6 @@ main(void) {
     MASK = 0xFDFFFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
 
-    // ===================================================== //
-    // MAIN LOOP                                             //
-    // ===================================================== //
     do {
         // CHECK B0 (GPIO5) FOR HIGH - RIGHT TO LEFT //
         // 0000 0000 0000 0000 0000 0000 0010 0000   //
