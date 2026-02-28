@@ -73,7 +73,7 @@ int main(void) {
         }
         
         // Check exit button
-        if (b2_state == 0) {
+        if (b2_state == 1) {
             printf("Exit button pressed\n");
             break;
         }

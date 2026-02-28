@@ -22,6 +22,7 @@ main(void) {
     int MEM, MASK;
     int BUTTON = 0;
     int pos = 0;   // CURRENT LED POSITION 0~3 //
+    int dir = 0;   // 0=STOP 1=LEFT TO RIGHT 2=RIGHT TO LEFT
 
     // TEST FOR ROOT ACCESS //
     if (getuid() != 0) {
@@ -119,6 +120,7 @@ main(void) {
             pos = (pos - 1 + 4) % 4;  // 3->2->1->0->3
             printf("位置移动到: %d\n", pos);
         }
+        // 如果 dir == 0，位置不变（停止）
         
         // 检查退出按钮
         MASK = 0x08000000;
