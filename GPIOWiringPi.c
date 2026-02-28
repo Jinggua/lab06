@@ -1,12 +1,11 @@
 /*
- * File: GPIOWiringPi.c
+ * File: Marquee.c
  * Author: Dianyao Su
  * Date: 2026/02/27
- * Description: 4 LED Marquee with 3 button control using WiringPi Library.
- *              B0 (GPIO5) : move LEDs right to left
- *              B1 (GPIO6) : move LEDs left to right
- *              B2 (GPIO27): stop the program
- *              LEDs: GPIO22, GPIO23, GPIO24, GPIO25
+ * Description: KEYBOARD LED MARQUEE EFFECT USING WIRINGPI LIBRARY.
+ *              PRESS R TO MOVE LEDS RIGHT TO LEFT,
+ *              PRESS L TO MOVE LEDS LEFT TO RIGHT,
+ *              PRESS Q TO QUIT THE PROGRAM.
  */
 
 // 4 LED Marquee with 3 button control - WiringPi Version
@@ -27,16 +26,16 @@ int main(void) {
     }
     
     // Define pins (using BCM GPIO numbers)
-    // int LED1 = 22;   // GPIO22
-    // int LED2 = 23;   // GPIO23
-    // int LED3 = 24;   // GPIO24
-    // int LED4 = 25;   // GPIO25
+    int LED1 = 22;   // GPIO22
+    int LED2 = 23;   // GPIO23
+    int LED3 = 24;   // GPIO24
+    int LED4 = 25;   // GPIO25
     
     int B0 = 5;      // GPIO5  (right to left)
     int B1 = 6;      // GPIO6  (left to right)
     int B2 = 27;     // GPIO27 (exit)
-    // Define pins (using BCM GPIO numbers)
-    int leds[4] = {22, 23, 24, 24}; //  GPIO22  GPIO23  GPIO24  GPIO25
+    
+    int leds[4] = {LED1, LED2, LED3, LED4};
     int pos = 0;
     int dir = 0;     // STOP  = 0 LEFT TO RIGHT = 1 RIGHT TO LEFT = 2
     
@@ -55,6 +54,7 @@ int main(void) {
     pullUpDnControl(B1, PUD_UP);
     pullUpDnControl(B2, PUD_UP);
     
+    printf("Program started...\n");
     printf("Switch left (GPIO5): right to left\n");
     printf("Switch right (GPIO6): left to right\n");
     printf("Press B2 (GPIO27): exit program\n");
