@@ -83,13 +83,12 @@ main(void) {
                (gpio_level & 0x00000040) ? 1 : 0);
         
         // CHECK B0 (GPIO5) FOR HIGH - RIGHT TO LEFT //
-        if (gpio_level & 0x00000020) {
+        if ((gpio_level & 0x00000020) == 0) {  // GPIO5=0
             dir = 1;
             printf("方向: 右到左\n");
         }
-
-        // CHECK B1 (GPIO6) FOR HIGH - LEFT TO RIGHT //
-        if (gpio_level & 0x00000040) {
+        // CHECK B1 (GPIO6) FOR LOW - LEFT TO RIGHT //
+        else if ((gpio_level & 0x00000040) == 0) {  // GPIO6=0
             dir = 2;
             printf("方向: 左到右\n");
         }
