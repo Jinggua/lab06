@@ -74,16 +74,24 @@ main(void) {
     *(GPIO + 10) = MASK;
 
     do {
+        // 读取所有GPIO状态
+        unsigned int gpio_level = *(GPIO + 13);
+        
+        // 显示GPIO5和GPIO6的状态
+        printf("GPIO5: %d, GPIO6: %d\n", 
+               (gpio_level & 0x00000020) ? 1 : 0,
+               (gpio_level & 0x00000040) ? 1 : 0);
+        
         // CHECK B0 (GPIO5) FOR HIGH - RIGHT TO LEFT //
-        MASK = 0x00000020;
-        if (*(GPIO + 13) & MASK) {
+        if (gpio_level & 0x00000020) {
             dir = 1;
+            printf("方向: 右到左\n");
         }
 
         // CHECK B1 (GPIO6) FOR HIGH - LEFT TO RIGHT //
-        MASK = 0x00000040;
-        if (*(GPIO + 13) & MASK) {
+        if (gpio_level & 0x00000040) {
             dir = 2;
+            printf("方向: 左到右\n");
         }
 
         // TURN ALL LEDs OFF - 一次性设置所有位 //
@@ -137,6 +145,8 @@ main(void) {
         // CHECK GPIO 27 FOR HIGH - EXIT //
         MASK = 0x08000000;
         BUTTON = *(GPIO + 13) & MASK;
+        
+        usleep(500000);  // 加长延迟，方便观察
 
     } while (BUTTON == 0);
 
