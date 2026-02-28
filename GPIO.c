@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-main(void) {
+int main(void) {
     // USE VIRTUAL MEMORY SPACE FOR PI 4 //
     unsigned int BASE = 0xFE200000;
 
@@ -71,48 +71,44 @@ main(void) {
 
     // TURN ALL LEDs OFF INITIALLY //
     // SET GPIO 22 LOW //
-    // 0000 0000 0100 0000 0000 0000 0000 0000 //
+    // 0000 0000 0100 0000 0000 0000 0000 0000 (bit22) //
     MASK = 0x00400000;
     *(GPIO + 10) = *(GPIO + 10) | MASK;
-    // REMOVE LOW COMMAND //
-    // 1111 1111 1011 1111 1111 1111 1111 1111 //
+    // REMOVE LOW COMMAND (not necessary, but keeping style)
     MASK = 0xFFBFFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
+    
     // SET GPIO 23 LOW //
-    // 0000 0000 1000 0000 0000 0000 0000 0000 //
+    // 0000 0000 1000 0000 0000 0000 0000 0000 (bit23) //
     MASK = 0x00800000;
     *(GPIO + 10) = *(GPIO + 10) | MASK;
-    // REMOVE LOW COMMAND //
-    // 1111 1111 0111 1111 1111 1111 1111 1111 //
     MASK = 0xFF7FFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
+    
     // SET GPIO 24 LOW //
-    // 0000 0001 0000 0000 0000 0000 0000 0000 //
+    // 0000 0001 0000 0000 0000 0000 0000 0000 (bit24) //
     MASK = 0x01000000;
     *(GPIO + 10) = *(GPIO + 10) | MASK;
-    // REMOVE LOW COMMAND //
-    // 1111 1110 1111 1111 1111 1111 1111 1111 //
     MASK = 0xFEFFFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
+    
     // SET GPIO 25 LOW //
-    // 0000 0010 0000 0000 0000 0000 0000 0000 //
+    // 0000 0010 0000 0000 0000 0000 0000 0000 (bit25) //
     MASK = 0x02000000;
     *(GPIO + 10) = *(GPIO + 10) | MASK;
-    // REMOVE LOW COMMAND //
-    // 1111 1101 1111 1111 1111 1111 1111 1111 //
     MASK = 0xFDFFFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
 
     do {
         // CHECK B0 (GPIO5) FOR HIGH - RIGHT TO LEFT //
-        // 0000 0000 0000 0000 0000 0000 0010 0000   //
+        // 0000 0000 0000 0000 0000 0000 0010 0000 (bit5) //
         MASK = 0x00000020;
         if (*(GPIO + 13) & MASK) {
             dir = 1;
         }
 
         // CHECK B1 (GPIO6) FOR HIGH - LEFT TO RIGHT //
-        // 0000 0000 0000 0000 0000 0000 0100 0000   //
+        // 0000 0000 0000 0000 0000 0000 0100 0000 (bit6) //
         MASK = 0x00000040;
         if (*(GPIO + 13) & MASK) {
             dir = 2;
@@ -120,77 +116,60 @@ main(void) {
 
         // TURN ALL LEDs OFF //
         // SET GPIO 22 LOW //
-        // 0000 0000 0100 0000 0000 0000 0000 0000 //
         MASK = 0x00400000;
         *(GPIO + 10) = *(GPIO + 10) | MASK;
-        // REMOVE LOW COMMAND //
-        // 1111 1111 1011 1111 1111 1111 1111 1111 //
         MASK = 0xFFBFFFFF;
         *(GPIO + 10) = *(GPIO + 10) & MASK;
+        
         // SET GPIO 23 LOW //
-        // 0000 0000 1000 0000 0000 0000 0000 0000 //
         MASK = 0x00800000;
         *(GPIO + 10) = *(GPIO + 10) | MASK;
-        // REMOVE LOW COMMAND //
-        // 1111 1111 0111 1111 1111 1111 1111 1111 //
         MASK = 0xFF7FFFFF;
         *(GPIO + 10) = *(GPIO + 10) & MASK;
+        
         // SET GPIO 24 LOW //
-        // 0000 0001 0000 0000 0000 0000 0000 0000 //
         MASK = 0x01000000;
         *(GPIO + 10) = *(GPIO + 10) | MASK;
-        // REMOVE LOW COMMAND //
-        // 1111 1110 1111 1111 1111 1111 1111 1111 //
         MASK = 0xFEFFFFFF;
         *(GPIO + 10) = *(GPIO + 10) & MASK;
+        
         // SET GPIO 25 LOW //
-        // 0000 0010 0000 0000 0000 0000 0000 0000 //
         MASK = 0x02000000;
         *(GPIO + 10) = *(GPIO + 10) | MASK;
-        // REMOVE LOW COMMAND //
-        // 1111 1101 1111 1111 1111 1111 1111 1111 //
         MASK = 0xFDFFFFFF;
         *(GPIO + 10) = *(GPIO + 10) & MASK;
 
         // SET CURRENT LED HIGH //
         if (pos == 0) {
             // SET GPIO 22 HIGH //
-            // 0000 0000 0100 0000 0000 0000 0000 0000 //
             MASK = 0x00400000;
             *(GPIO + 7) = *(GPIO + 7) | MASK;
             usleep(200000);
             // REMOVE HIGH COMMAND //
-            // 1111 1111 1011 1111 1111 1111 1111 1111 //
             MASK = 0xFFBFFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         } else if (pos == 1) {
             // SET GPIO 23 HIGH //
-            // 0000 0000 1000 0000 0000 0000 0000 0000 //
             MASK = 0x00800000;
             *(GPIO + 7) = *(GPIO + 7) | MASK;
             usleep(200000);
             // REMOVE HIGH COMMAND //
-            // 1111 1111 0111 1111 1111 1111 1111 1111 //
             MASK = 0xFF7FFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         } else if (pos == 2) {
             // SET GPIO 24 HIGH //
-            // 0000 0001 0000 0000 0000 0000 0000 0000 //
             MASK = 0x01000000;
             *(GPIO + 7) = *(GPIO + 7) | MASK;
             usleep(200000);
             // REMOVE HIGH COMMAND //
-            // 1111 1110 1111 1111 1111 1111 1111 1111 //
             MASK = 0xFEFFFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         } else if (pos == 3) {
             // SET GPIO 25 HIGH //
-            // 0000 0010 0000 0000 0000 0000 0000 0000 //
             MASK = 0x02000000;
             *(GPIO + 7) = *(GPIO + 7) | MASK;
             usleep(200000);
             // REMOVE HIGH COMMAND //
-            // 1111 1101 1111 1111 1111 1111 1111 1111 //
             MASK = 0xFDFFFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         }
@@ -205,7 +184,7 @@ main(void) {
         }
 
         // CHECK GPIO 27 FOR HIGH - EXIT //
-        // 0000 1000 0000 0000 0000 0000 0000 0000 //
+        // 0000 1000 0000 0000 0000 0000 0000 0000 (bit27) //
         MASK = 0x08000000;
         BUTTON = *(GPIO + 13) & MASK;
 
@@ -217,16 +196,19 @@ main(void) {
     *(GPIO + 10) = *(GPIO + 10) | MASK;
     MASK = 0xFFBFFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
+    
     // SET GPIO 23 LOW //
     MASK = 0x00800000;
     *(GPIO + 10) = *(GPIO + 10) | MASK;
     MASK = 0xFF7FFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
+    
     // SET GPIO 24 LOW //
     MASK = 0x01000000;
     *(GPIO + 10) = *(GPIO + 10) | MASK;
     MASK = 0xFEFFFFFF;
     *(GPIO + 10) = *(GPIO + 10) & MASK;
+    
     // SET GPIO 25 LOW //
     MASK = 0x02000000;
     *(GPIO + 10) = *(GPIO + 10) | MASK;
@@ -234,4 +216,5 @@ main(void) {
     *(GPIO + 10) = *(GPIO + 10) & MASK;
 
     close(MEM);
+    return 0;
 }
