@@ -1,4 +1,4 @@
-// P15 - PROGRAM GPIO MEM CONTROL              //
+// P15 - PROGRAM GPIO MEM CONTROL - WITH LED AND BUTTON TEST //
 // 4 LED Marquee with 3 button control         //
 // B0 (GPIO5) : move LEDs right to left        //
 // B1 (GPIO6) : move LEDs left to right        //
@@ -66,26 +66,35 @@ main(void) {
     // TURN ALL LEDs OFF INITIALLY
     MASK = 0x00400000 | 0x00800000 | 0x01000000 | 0x02000000;
     *(GPIO + 10) = MASK;
+    
+    printf("Program Started - Button Test Mode\n");
+    printf("Format: GPIO5 GPIO6 GPIO27 | Direction | Position\n");
 
     do {
-        // 读取按钮状态
+        // 读取所有GPIO状态
         unsigned int gpio_level = *(GPIO + 13);
         
-        // 显示GPIO5和GPIO6的状态（调试用）
-        printf("GPIO5: %d, GPIO6: %d\n", 
-              (gpio_level & 0x00000020) ? 1 : 0,
-              (gpio_level & 0x00000040) ? 1 : 0);
+        int b0 = (gpio_level & 0x00000020) ? 1 : 0;
+        int b1 = (gpio_level & 0x00000040) ? 1 : 0;
+        int b2 = (gpio_level & 0x08000000) ? 1 : 0;
         
-        // 检测GPIO5低电平（开关拨向左）- 从右到左
-        if ((gpio_level & 0x00000020) == 0) {
-            dir = 2;  // 从右到左
-            printf("方向: 从右到左\n");
+        // 显示按钮状态
+        printf("GPIO5:%d GPIO6:%d GPIO27:%d | ", b0, b1, b2);
+        
+        // 根据实际观察到的按钮状态来设置方向
+        // 暂时注释掉原来的方向检测，改为手动观察
+        /*
+        if (b0 == 0) {
+            dir = 2;
+            printf("DIR:R->L ");
+        } else if (b1 == 0) {
+            dir = 1;
+            printf("DIR:L->R ");
+        } else {
+            printf("DIR:STOP ");
         }
-        // 检测GPIO6低电平（开关拨向右）- 从左到右
-        else if ((gpio_level & 0x00000040) == 0) {
-            dir = 1;  // 从左到右
-            printf("方向: 从左到右\n");
-        }
+        */
+        printf("DIR:-- ");
         
         // TURN ALL LEDs OFF
         MASK = 0x00400000 | 0x00800000 | 0x01000000 | 0x02000000;
@@ -97,36 +106,33 @@ main(void) {
         if (pos == 0) {
             MASK = 0x00400000;  // GPIO22 (LED1)
             *(GPIO + 7) = MASK;
+            printf("POS:0(LED1)\n");
             usleep(200000);
         } else if (pos == 1) {
             MASK = 0x00800000;  // GPIO23 (LED2)
             *(GPIO + 7) = MASK;
+            printf("POS:1(LED2)\n");
             usleep(200000);
         } else if (pos == 2) {
             MASK = 0x01000000;  // GPIO24 (LED3)
             *(GPIO + 7) = MASK;
+            printf("POS:2(LED3)\n");
             usleep(200000);
         } else if (pos == 3) {
             MASK = 0x02000000;  // GPIO25 (LED4)
             *(GPIO + 7) = MASK;
+            printf("POS:3(LED4)\n");
             usleep(200000);
         }
         
-        // 根据方向移动位置
-        if (dir == 1) {  // 从左到右
-            pos = (pos + 1) % 4;  // 0->1->2->3->0
-            printf("位置移动到: %d\n", pos);
-        } else if (dir == 2) {  // 从右到左
-            pos = (pos - 1 + 4) % 4;  // 3->2->1->0->3
-            printf("位置移动到: %d\n", pos);
-        }
-        // 如果 dir == 0，位置不变（停止）
+        // 临时让LED自动循环，方便观察
+        pos = (pos + 1) % 4;
         
-        // 检查退出按钮
-        MASK = 0x08000000;
-        BUTTON = *(GPIO + 13) & MASK;
+        // 检查退出按钮 - 暂时禁用
+        // MASK = 0x08000000;
+        // BUTTON = *(GPIO + 13) & MASK;
         
-    } while (BUTTON == 0);
+    } while (1);  // 无限循环，按Ctrl+C退出
 
     // TURN ALL LEDs OFF BEFORE EXIT
     MASK = 0x00400000 | 0x00800000 | 0x01000000 | 0x02000000;
