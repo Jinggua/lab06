@@ -69,78 +69,58 @@ main(void) {
     MASK = 0xFF807FFF;
     *(GPIO + 0) = *(GPIO + 0) & MASK;
 
-    // TURN ALL LEDs OFF INITIALLY         //
-    // GPCLR0: write 1 to clear, no remove needed //
-    // 0000 0000 0100 0000 0000 0000 0000 0000 - GPIO22 //
-    // 0000 0000 1000 0000 0000 0000 0000 0000 - GPIO23 //
-    // 0000 0001 0000 0000 0000 0000 0000 0000 - GPIO24 //
-    // 0000 0010 0000 0000 0000 0000 0000 0000 - GPIO25 //
-    *(GPIO + 10) = 0x00400000;
-    *(GPIO + 10) = 0x00800000;
-    *(GPIO + 10) = 0x01000000;
-    *(GPIO + 10) = 0x02000000;
+    // TURN ALL LEDs OFF INITIALLY - 使用OR操作组合所有位 //
+    MASK = 0x00400000 | 0x00800000 | 0x01000000 | 0x02000000;  // 0x03C00000
+    *(GPIO + 10) = MASK;
 
     do {
         // CHECK B0 (GPIO5) FOR HIGH - RIGHT TO LEFT //
-        // 0000 0000 0000 0000 0000 0000 0010 0000   //
         MASK = 0x00000020;
         if (*(GPIO + 13) & MASK) {
             dir = 1;
         }
 
         // CHECK B1 (GPIO6) FOR HIGH - LEFT TO RIGHT //
-        // 0000 0000 0000 0000 0000 0000 0100 0000   //
         MASK = 0x00000040;
         if (*(GPIO + 13) & MASK) {
             dir = 2;
         }
 
-        // TURN ALL LEDs OFF //
-        // GPCLR0: write 1 to clear, no remove needed //
-        *(GPIO + 10) = 0x00400000;   // GPIO22 LOW //
-        *(GPIO + 10) = 0x00800000;   // GPIO23 LOW //
-        *(GPIO + 10) = 0x01000000;   // GPIO24 LOW //
-        *(GPIO + 10) = 0x02000000;   // GPIO25 LOW //
+        // TURN ALL LEDs OFF - 一次性设置所有位 //
+        MASK = 0x00400000 | 0x00800000 | 0x01000000 | 0x02000000;  // 0x03C00000
+        *(GPIO + 10) = MASK;
+
+        // 短暂延迟确保GPCLR生效
+        usleep(1000);
 
         // SET CURRENT LED HIGH //
         if (pos == 0) {
             // SET GPIO 22 HIGH //
-            // 0000 0000 0100 0000 0000 0000 0000 0000 //
             MASK = 0x00400000;
-            *(GPIO + 7) = *(GPIO + 7) | MASK;
+            *(GPIO + 7) = MASK;  // 直接赋值而不是OR，因为只需要设置这一个
             usleep(200000);
-            // REMOVE HIGH COMMAND //
-            // 1111 1111 1011 1111 1111 1111 1111 1111 //
+            // REMOVE HIGH COMMAND (实际上不需要，因为下次循环会先清零)
             MASK = 0xFFBFFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         } else if (pos == 1) {
             // SET GPIO 23 HIGH //
-            // 0000 0000 1000 0000 0000 0000 0000 0000 //
             MASK = 0x00800000;
-            *(GPIO + 7) = *(GPIO + 7) | MASK;
+            *(GPIO + 7) = MASK;  // 直接赋值
             usleep(200000);
-            // REMOVE HIGH COMMAND //
-            // 1111 1111 0111 1111 1111 1111 1111 1111 //
             MASK = 0xFF7FFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         } else if (pos == 2) {
             // SET GPIO 24 HIGH //
-            // 0000 0001 0000 0000 0000 0000 0000 0000 //
             MASK = 0x01000000;
-            *(GPIO + 7) = *(GPIO + 7) | MASK;
+            *(GPIO + 7) = MASK;  // 直接赋值
             usleep(200000);
-            // REMOVE HIGH COMMAND //
-            // 1111 1110 1111 1111 1111 1111 1111 1111 //
             MASK = 0xFEFFFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         } else if (pos == 3) {
             // SET GPIO 25 HIGH //
-            // 0000 0010 0000 0000 0000 0000 0000 0000 //
             MASK = 0x02000000;
-            *(GPIO + 7) = *(GPIO + 7) | MASK;
+            *(GPIO + 7) = MASK;  // 直接赋值
             usleep(200000);
-            // REMOVE HIGH COMMAND //
-            // 1111 1101 1111 1111 1111 1111 1111 1111 //
             MASK = 0xFDFFFFFF;
             *(GPIO + 7) = *(GPIO + 7) & MASK;
         }
@@ -155,17 +135,14 @@ main(void) {
         }
 
         // CHECK GPIO 27 FOR HIGH - EXIT //
-        // 0000 1000 0000 0000 0000 0000 0000 0000 //
         MASK = 0x08000000;
         BUTTON = *(GPIO + 13) & MASK;
 
     } while (BUTTON == 0);
 
     // TURN ALL LEDs OFF BEFORE EXIT //
-    *(GPIO + 10) = 0x00400000;   // GPIO22 LOW //
-    *(GPIO + 10) = 0x00800000;   // GPIO23 LOW //
-    *(GPIO + 10) = 0x01000000;   // GPIO24 LOW //
-    *(GPIO + 10) = 0x02000000;   // GPIO25 LOW //
+    MASK = 0x00400000 | 0x00800000 | 0x01000000 | 0x02000000;
+    *(GPIO + 10) = MASK;
 
     close(MEM);
 }
